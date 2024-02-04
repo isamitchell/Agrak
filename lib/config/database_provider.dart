@@ -22,5 +22,5 @@ Isar db(DbRef ref) {
     throw Exception('Isar no Inicializado');
   }
   return isar;
-  print('isar funciona');
+  
 }

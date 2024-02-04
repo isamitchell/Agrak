@@ -7,48 +7,80 @@ part 'user_model.g.dart';
 
 @collection
 class User {
-  final Id id;
+  final String id;
+  Id get isarId => fastHash(id);
   final String firstName;
   final String avatar;
   final String email;
   final String secondName;
-  final String? password;
   final DateTime createdAt;
+
   User({
     required this.id,
+    required this.createdAt,
     required this.firstName,
     required this.avatar,
     required this.email,
     required this.secondName,
-    this.password,
-    required this.createdAt,
   });
+
+  User copyWith({
+    String? id,
+    DateTime? createdAt,
+    String? firstName,
+    String? avatar,
+    String? email,
+    String? secondName,
+  }) {
+    return User(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      firstName: firstName ?? this.firstName,
+      avatar: avatar ?? this.avatar,
+      email: email ?? this.email,
+      secondName: secondName ?? this.secondName,
+    );
+  }
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
-      'firstName': firstName,
+      'first_name': firstName,
       'avatar': avatar,
       'email': email,
-      'secondName': secondName,
-      'password': password,
-      'createdAt': createdAt.millisecondsSinceEpoch,
+      'second_name': secondName,
+      'createdAt': createdAt.toUtc(),
     };
   }
 
   factory User.fromMap(Map<String, dynamic> map) {
     return User(
-      id: map['id'],
-      firstName: map['firstName'] as String,
+      id: map['id'] as String,
+      firstName: map['first_name'] as String,
       avatar: map['avatar'] as String,
       email: map['email'] as String,
-      secondName: map['secondName'] as String,
-      password: map['password'] != null ? map['password'] as String : null,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int),
+      secondName: map['second_name'] as String,
+      createdAt: DateTime.parse(map['createdAt']), // Use the named parameter 'createdAt' here
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory User.fromJson(String source) => User.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory User.fromJson(String source) =>
+      User.fromMap(json.decode(source) as Map<String, dynamic>);
+}
+
+int fastHash(String string) {
+  var hash = 0xcbf29ce484222325;
+
+  var i = 0;
+  while (i < string.length) {
+    final codeUnit = string.codeUnitAt(i++);
+    hash ^= codeUnit >> 8;
+    hash *= 0x100000001b3;
+    hash ^= codeUnit & 0xFF;
+    hash *= 0x100000001b3;
+  }
+
+  return hash;
 }
